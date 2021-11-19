@@ -1,4 +1,6 @@
 class BooksController < ApplicationController
+  add_flash_types :info, :error, :warning
+  
   def index
     @books = Book.all
     @book = Book.new
@@ -13,8 +15,12 @@ class BooksController < ApplicationController
   
   def create
     @book = Book.new(book_params)
-    @book.save
-    redirect_to books_path
+    if @book.save
+      redirect_to book_path(@book), notice: "Book was successfully created."
+    else
+      flash.alert = "error"
+      redirect_to books_path
+    end
   end
 
   def edit
@@ -23,8 +29,11 @@ class BooksController < ApplicationController
   
   def update
     book = Book.find(params[:id])
-    book.update(book_params)
-    redirect_to book_path(book)
+    if book.update(book_params)
+      redirect_to book_path(book), notice: "Book was successfully created."
+    else
+      redirect_to edit_book_path(book), alert: "error!!!"
+    end
   end
   
   def destroy
